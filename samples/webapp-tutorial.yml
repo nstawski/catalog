@@ -1,0 +1,46 @@
+name: Web Application
+version: 0.1
+
+launch:
+    parameters: 
+         appPrefix:
+             description: Web application prefix
+             default: myApp
+         accessKey:
+             description: AWS Access Key
+         secretKey:
+             description: AWS Secret Key
+
+    steps:
+        - provision:
+            action: provisionAmazonVm
+            parameters:
+                 roleName: web
+                 jcloudsIdentity: $accessKey
+                 jcloudsCredential: $secretKey
+            output:
+                 publicIp: ips
+
+        - install:
+            action: installApache
+            parameters:
+                roles: [web]
+
+        - download:
+            action: gitClone
+            parameters:
+                roles: [web]
+                url: https://github.com/cometera/example-webapp.git
+                targetDirectory: /var/www/${appPrefix}
+
+    return:
+        - appUrl:
+            description: Url to the application
+            value: http://${publicIp}/${appPrefix}
+
+destroy:
+    steps:
+        - undeployEnv:
+            action: undeployEnv
+            parameters:
+                phase: destroy
