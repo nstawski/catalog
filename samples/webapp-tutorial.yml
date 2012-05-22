@@ -1,6 +1,3 @@
-name: Web Application
-version: 0.1
-
 launch:
     parameters: 
          appPrefix:
